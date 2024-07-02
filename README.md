@@ -6,23 +6,25 @@
 - kathmandupost
 - ndtv
 
-##  Approach 
-    - Use beautifulsoup to parse the html content coming from the API response
+###  Approach 
+Use beautifulsoup to parse the html content coming from the API response
+
 ---
 **Scrape discussions/posts/comments from social sites**
 - facebook
 - twitter
  - reddit
 
- ##  Approach 
-    - Use selenium (headless) to search accross each of the posts and scrape post contents and comments.
+###  Approach 
+Use selenium (headless) to search accross each of the posts and scrape post contents and comments.
+
 ---
 
 **Sentiment analyzer**
 - Chat GPT
 
- ##  Approach 
-    - Use selenium (headless) to search accross each of the posts and scrape post contents and comments.
+###  Approach 
+Use LLM (chatgpt) api to provide prompt and get prediction of sentiment.
 
 ---
 **Web Details**
