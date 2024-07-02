@@ -18,3 +18,5 @@ def clean_text(text):
 
   # Trim leading and trailing spaces
   text = text.strip()
+
+  return text

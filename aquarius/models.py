@@ -5,3 +5,10 @@ class City(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def verbose_name(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = 'City'
+        verbose_name_plural = 'Cities'
