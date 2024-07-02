@@ -1,13 +1,9 @@
 from .base import SentimentAnalyzer
 import time
 import openai
-from dotenv import dotenv_values
 from utils.data_preprocessing import clean_text
-config = dotenv_values(".env") 
-
-OPENAI_API_KEY=config.get('OPENAI_API_KEY')
-openai.api_key  = OPENAI_API_KEY
-
+from django.conf import settings
+openai.api_key  = settings.OPENAI_API_KEY
 
 class ChatGPTSentimentAnalyzer(SentimentAnalyzer):
 

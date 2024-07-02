@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import dotenv_values
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,6 @@ SECRET_KEY = 'django-insecure-v+hsskj-8h157(ru_d*3%m)e29n*8v%vw&6i+4211_k=0^cffm
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -123,3 +123,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+config = dotenv_values(".env")
+
+# Open API
+OPENAI_API_KEY = config.get('OPENAI_API_KEY')
+TWITTER_USERNAME = config.get('TWITTER_USERNAME')
+TWITTER_PASSWORD = config.get('TWITTER_PASSWORD')
