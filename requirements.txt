@@ -3,3 +3,5 @@ python-dotenv
 pandas==2.2.2
 Django==5.0.6
 djangorestframework==3.15.2
+selenium==4.22.0
+webdriver-manager==4.0.1
