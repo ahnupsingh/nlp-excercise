@@ -3,12 +3,15 @@ import time
 import openai
 from utils.data_preprocessing import clean_text
 from django.conf import settings
-openai.api_key  = settings.OPENAI_API_KEY
+import pandas as pd
 
+openai.api_key  = settings.OPENAI_API_KEY
 class ChatGPTSentimentAnalyzer(SentimentAnalyzer):
 
-    def __init__(self):
-        pass
+    def __init__(self, enable_batching=True, batch_size=50):
+        self.model = "gpt-3.5-turbo-1106"
+        self.enable_batching = enable_batching
+        self.batch_size = batch_size
 
     def analyze_sentiment(self, text):
         response = self.analyze(text=text)
@@ -32,53 +35,51 @@ class ChatGPTSentimentAnalyzer(SentimentAnalyzer):
             data_balanced = mydata.copy()
         return data_balanced
     
-    def analyze_sentiment_in_batch(self, data):
-        data_balanced = self.prepare_data(data)
-        reviews = data_balanced['review'].tolist()
+    def batch_data(self, test_set):
+        batches = pd.DataFrame()
+        test_set['pred_label'] = ''
+        for i in range(0, len(test_set), self.batch_size):
+            batches.append(test_set[i : i + self.batch_size])
+        batch_count = len(batches)
+        return batches, batch_count
+    
+    def preprocess_data(self, data):
+        reviews = data['review'].tolist()
         cleaned_reviews = [clean_text(str(review)) for review in reviews]
-        print(cleaned_reviews)
 
         # Add the cleaned reviews as a new column to the DataFrame
-        data_balanced['clean_reviews'] = cleaned_reviews
-
-        # Assuming your DataFrame is called "df"
-        total_rows = len(data_balanced)
+        data['clean_reviews'] = cleaned_reviews
+        total_rows = len(data)
         test_size = int(total_rows * 0.95)
 
         # Randomly sample train_size rows for the training set
-        test_set = data_balanced.sample(test_size)
+        test_set = data.sample(test_size)
 
         # Get the remaining rows for the test set
-        train_set = data_balanced.drop(test_set.index)
-
-        batches = []
-        batch_size = 50
-
-        test_set_total = test_set.sample(100)
-        test_set_total['pred_label'] = ''
-
-        for i in range(0, len(test_set_total), batch_size):
-            batches.append(test_set_total[i : i + batch_size])
-
+        train_set = data.drop(test_set.index)
         train_sample = train_set.sample(4)
-        batch_count = len(batches)
+        test_set_total = test_set.sample(100)
+        return test_set_total, train_sample
+
+    
+    def analyze_sentiment_in_batch(self, data):
+        data_balanced = self.prepare_data(data)
+        test_set, train_sample = self.preprocess_data(data_balanced)
+        if self.enable_batching:
+            print("Batching data")
+            batches = self.batch_data(test_set)
+        else:
+            batches = test_set
+
         responses = []
-        for i in range(0,len(batches)):
-            responses.append(self.gpt_completion_function(batches[i],i,batch_count,train_sample))
+        batch_count = len(batches)
+        for i in range(0,batch_count):
+            print(f"Now processing batch#: {i+1} of total batch : {batch_count}")
+            responses.append(self.gpt_completion_function(batches[i],train_sample))
         return responses
 
-
-    def gpt_completion_function(self, batch,current_batch,total_batch,train_sample,model="gpt-3.5-turbo-1106"):
-        """Function works in three steps:
-        # Step-1: Convert the DataFrame to JSON using the to_json() method.
-        # Step-2: Preparing the Gemini Prompt
-        # Step-3: Calling GPT API
-        """
-
-        json_data = batch[['clean_reviews','pred_label']].to_json(orient='records')
-        sample_json_data = train_sample[['clean_reviews','label']].to_json(orient='records')
-
-        prompt = f"""You are an expert linguist, who is good at classifying customer review sentiments into Positive/Negative labels.
+    def format_prompt(self, json_data, sample_json_data):
+        return f"""You are an expert linguist, who is good at classifying customer review sentiments into Positive/Negative labels.
         Help me classify customer reviews into: Positive(label=1), and Negative(label=0).
         Customer reviews are provided between three backticks below.
         In your output, only return the Json code back as output - which is provided between three backticks.
@@ -95,12 +96,16 @@ class ChatGPTSentimentAnalyzer(SentimentAnalyzer):
         {sample_json_data}
         ####
         """
-
-        print(f"Now processing batch#: {current_batch+1} of {total_batch}")
+    
+    def gpt_completion_function(self, batch,train_sample):
+        print('batch', batch)
+        json_data = batch[['clean_reviews','pred_label']].to_json(orient='records')
+        sample_json_data = train_sample[['clean_reviews','label']].to_json(orient='records')
+        prompt = self.format_prompt(json_data, sample_json_data)
         json_data = batch[['clean_reviews','pred_label']].to_json(orient='records')
         sample_json_data = train_sample[['clean_reviews','label']].to_json(orient='records')
         messages = [{"role": "user", "content": prompt}]
-        response = openai.ChatCompletion.create(model=model,messages=messages,temperature=0)
+        response = openai.ChatCompletion.create(model=self.model,messages=messages,temperature=0)
         time.sleep(5)
         return response.choices[0].message["content"]
 
