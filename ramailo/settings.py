@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 from dotenv import dotenv_values
 
@@ -31,6 +31,12 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "unfold",
+    "unfold.contrib.forms",
+    "unfold.contrib.filters", 
+    "unfold.contrib.inlines",
+    "unfold.contrib.import_export",
+    "unfold.contrib.simple_history",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,7 +62,7 @@ ROOT_URLCONF = 'ramailo.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -131,3 +137,61 @@ config = dotenv_values(".env")
 OPENAI_API_KEY = config.get('OPENAI_API_KEY')
 TWITTER_USERNAME = config.get('TWITTER_USERNAME')
 TWITTER_PASSWORD = config.get('TWITTER_PASSWORD')
+
+UNFOLD = {
+    "SITE_TITLE": "Ramailo",
+    "SITE_HEADER": "MLExperts",
+    "SITE_URL": "/",
+    "SITE_SYMBOL": "settings",
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "DASHBOARD_CALLBACK": "aquarius.views.dashboard_callback",
+    "COLORS": {
+        "primary": {
+            "50": "250 245 255",
+            "100": "243 232 255",
+            "200": "233 213 255",
+            "300": "216 180 254",
+            "400": "192 132 252",
+            "500": "168 85 247",
+            "600": "147 51 234",
+            "700": "126 34 206",
+            "800": "107 33 168",
+            "900": "88 28 135",
+            "950": "59 7 100",
+        },
+    },
+    "EXTENSIONS": {
+        "modeltranslation": {
+            "flags": {
+                "en": "🇬🇧",
+                "fr": "🇫🇷",
+                "nl": "🇧🇪",
+            },
+        },
+    },
+    "SIDEBAR": {
+        "show_search": False,
+        "show_all_applications": False,
+        "navigation": [
+            {
+                "title": ("Navigation"),
+                "separator": True,
+                "items": [
+                    {
+                        "title": ("Dashboard"),
+                        "icon": "dashboard",  # Supported icon set: https://fonts.google.com/icons
+                        "badge": "",
+                        "permission": lambda request: request.user.is_superuser,
+                        "link": "#",
+                    },
+                    {
+                        "title": ("Hot Topics"),
+                        "icon": "people",
+                        "link": "#",
+                    },
+                ],
+            },
+        ],
+    },
+}
