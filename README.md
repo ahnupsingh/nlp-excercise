@@ -20,12 +20,43 @@ Use selenium (headless) to search accross each of the posts and scrape post cont
 
 ---
 
-**Sentiment analyzer**
-- Chat GPT
+## Sentiment analyzer
 
-###  Approach 
+**Approach**
 Use LLM (chatgpt) api to provide prompt and get prediction of sentiment.
+Prompt: 
+```
+        You are an expert linguist, who is good at classifying customer review sentiments into Positive/Negative labels.
+        Help me classify customer reviews into: Positive(label=1), and Negative(label=0).
+        Customer reviews are provided between three backticks below.
+        In your output, only return the Json code back as output - which is provided between three backticks.
+        Your task is to update predicted labels under 'pred_label' in the Json code.
+        Don't make any changes to Json code format, please.
+        Error handling instruction: In case a Customer Review violates API policy, please assign it default sentiment as Negative (label=0).
+        Examples of good Sentiment Analysis Classification are provided between separator ####.
+        These examples are for your reference, not to be included in your final output.
 
+        ```
+        {json_data}
+        ```
+        ####
+        {sample_json_data}
+        ####
+```
+
+---
+
+### Comments Classification
+**Approach**
+Use LLM (chatgpt) api to classify if the comments are in favour, neutral or against.
+Prompt: 
+```
+Classify the following comment as 'in favor', 'against', or 'neutral':
+
+{comment}
+
+Classification:
+```
 ---
 **Web Details**
 - Backend [Django]
