@@ -58,7 +58,7 @@ Classify the following comment as 'in favor', 'against', or 'neutral':
 Classification:
 ```
 ---
-**Web Details**
+### Web Details
 - Backend [Django]
 - SQLite [Database]
     - News
@@ -74,3 +74,14 @@ Classification:
     - Details
         - Sentiment analysis details on each topic
         -  
+
+### Images
+
+**Generate hot topics for any City** 
+![alt text](https://github.com/ahnupsingh/nlp-excercise/blob/main/generate-hot-topics.png?raw=true)
+
+**List Hot topics by City** 
+![alt text](https://github.com/ahnupsingh/nlp-excercise/blob/main/nlp-hot-topics.png?raw=true)
+
+**Analyze posts** 
+![alt text](https://github.com/ahnupsingh/nlp-excercise/blob/main/analyze-post.png?raw=true)
