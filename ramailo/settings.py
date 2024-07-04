@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 from dotenv import dotenv_values
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -86,6 +88,22 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+}
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.template': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
 }
 
 
@@ -171,24 +189,40 @@ UNFOLD = {
         },
     },
     "SIDEBAR": {
-        "show_search": False,
-        "show_all_applications": False,
+        "show_search": False,  # Search in applications and models names
+        "show_all_applications": False,  # Dropdown with all applications and models
         "navigation": [
             {
-                "title": ("Navigation"),
-                "separator": True,
+                "title": _("Navigation"),
+                "separator": True,  # Top border
                 "items": [
                     {
-                        "title": ("Dashboard"),
+                        "title": _("Dashboard"),
                         "icon": "dashboard",  # Supported icon set: https://fonts.google.com/icons
-                        "badge": "",
+                        "link": reverse_lazy("admin:index"),
+                        "badge": "aquarius.views.report_badge_callback",
                         "permission": lambda request: request.user.is_superuser,
-                        "link": "#",
                     },
                     {
-                        "title": ("Hot Topics"),
-                        "icon": "people",
-                        "link": "#",
+                        "title": _("Cities"),
+                        "icon": "map",
+                        "badge": "aquarius.views.city_badge_callback",
+                        "link": reverse_lazy("admin:aquarius_city_changelist"),
+                    },
+
+                    {
+                        "title": _("Users"),
+                        "icon": "person",
+                        "badge": "aquarius.views.user_badge_callback",
+                        "link": reverse_lazy("admin:auth_user_changelist"),
+                    },
+
+
+                    {
+                        "title": _("Groups"),
+                        "icon": "group",
+                        "badge": "aquarius.views.group_badge_callback",
+                        "link": reverse_lazy("admin:auth_group_changelist"),
                     },
                 ],
             },
