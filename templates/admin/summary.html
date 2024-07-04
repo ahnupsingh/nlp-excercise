@@ -1,0 +1,37 @@
+{% load unfold i18n %}
+
+{% block content %}
+    Summary for <strong>{{ topic }}</strong>
+    <br/>
+    <ul>
+        {% for comment in comments %}
+            <li>{{comment}}</li>
+            <hr/>
+        {% endfor %}
+    </ul>
+
+    {% component "unfold/components/flex.html" with class="gap-8 mb-8 flex-col lg:flex-row" %}
+        {% component "unfold/components/card.html" with class="lg:w-1/3" %}
+            <h2>In Favor</h2>
+            <p>Total: {{ summary.in_favor.total }}</p>
+            <ul>
+                {% for similarity, comments in summary.in_favor.arguments.items %}
+                    <li>{{ similarity }}: {{ comments|length }}</li>
+                {% endfor %}
+            </ul>
+        {% endcomponent %}
+        {% component "unfold/components/card.html" with class="lg:w-1/3" %}
+            <h2>Against</h2>
+            <p>Total: {{ summary.against.total }}</p>
+            <!-- <ul>
+                {% for similarity, comments in summary.against.arguments.items %}
+                    <li>{{ similarity }}: {{ comments|length }}</li>
+                {% endfor %}
+            </ul> -->
+        {% endcomponent %}
+        {% component "unfold/components/card.html" with class="lg:w-1/3" %}
+            <h2>Neutral</h2>
+            <p>Total: {{ summary.neutral }}</p>
+        {% endcomponent %}
+    {% endcomponent %}
+{% endblock %}

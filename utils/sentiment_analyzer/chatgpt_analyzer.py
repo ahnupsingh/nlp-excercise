@@ -108,4 +108,28 @@ class ChatGPTSentimentAnalyzer(SentimentAnalyzer):
         response = openai.ChatCompletion.create(model=self.model,messages=messages,temperature=0)
         time.sleep(5)
         return response.choices[0].message["content"]
+    
+    def classify_comments(self, comment):
+        prompt = f"Classify the following comment as 'in favor', 'against', or 'neutral':\n\n{comment}\n\nClassification:"
+        response = openai.ChatCompletion.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that classifies comments."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        classification = response.choices[0].message['content'].strip().lower()
+        return classification
 
+
+    def classify_comments_with_gpt3(self, comments):
+        classified_comments = {'in_favor': [], 'against': [], 'neutral': []}
+        for comment in comments:
+            classification = self.classify_comments(comment)
+            if classification == 'in favor':
+                classified_comments['in_favor'].append(comment)
+            elif classification == 'against':
+                classified_comments['against'].append(comment)
+            else:
+                classified_comments['neutral'].append(comment)
+        return classified_comments

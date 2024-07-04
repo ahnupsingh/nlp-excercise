@@ -1,0 +1,79 @@
+{% extends 'unfold/layouts/base_simple.html' %}
+
+{% load cache i18n %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block title %}
+    {% if subtitle %}
+        {{ subtitle }} |
+    {% endif %}
+
+    {{ title }} | {{ site_title|default:_('Django site admin') }}
+{% endblock %}
+
+{% block branding %}
+    <h1 id="site-name" class="ant-typography">
+        <a href="{% url 'admin:index' %}" class="ant-typography-link">
+            {{ site_header|default:_('Django administration') }}
+        </a>
+    </h1>
+{% endblock %}
+
+{% block content %}
+<div class="ant-layout-content" style="padding: 24px; background: #fff;">
+    <div class="ant-typography">
+        <h1 class="ant-typography-title level-1">Summary for {{ topic }}</h1>
+    </div>
+
+    {% if comments %}
+        <div class="ant-card ant-card-bordered" style="margin-bottom: 24px;">
+            <div class="ant-card-head">
+                <h2 class="ant-typography-title level-2">Comments</h2>
+            </div>
+            <ul class="ant-list ant-list-split">
+                {% for comment in comments %}
+                    <li class="ant-list-item">{{ comment }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <div class="ant-card ant-card-bordered" style="margin-bottom: 24px;">
+        <div class="ant-card-head">
+            <h2 class="ant-typography-title level-2">In Favor</h2>
+        </div>
+        <div class="ant-card-body">
+            <p>Total: {{ summary.in_favor.total }}</p>
+            <ul class="ant-list ant-list-split">
+                {% for similarity, comments in summary.in_favor.arguments.items %}
+                    <li class="ant-list-item">{{ similarity }}: {{ comments|length }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="ant-card ant-card-bordered" style="margin-bottom: 24px;">
+        <div class="ant-card-head">
+            <h2 class="ant-typography-title level-2">Against</h2>
+        </div>
+        <div class="ant-card-body">
+            <p>Total: {{ summary.against.total }}</p>
+            <ul class="ant-list ant-list-split">
+                {% for similarity, comments in summary.against.arguments.items %}
+                    <li class="ant-list-item">{{ similarity }}: {{ comments|length }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="ant-card ant-card-bordered" style="margin-bottom: 24px;">
+        <div class="ant-card-head">
+            <h2 class="ant-typography-title level-2">Neutral</h2>
+        </div>
+        <div class="ant-card-body">
+            <p>Total: {{ summary.neutral }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
