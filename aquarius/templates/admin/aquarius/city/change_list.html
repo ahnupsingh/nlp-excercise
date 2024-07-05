@@ -1,0 +1,8 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+    <h1>Customized Change List</h1>
+    <p>Here is some additional content or custom layout.</p>
+    {{ block.super }}
+    <p>Additional data: {{ additional_data }}</p>
+{% endblock %}

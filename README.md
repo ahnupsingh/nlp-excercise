@@ -51,11 +51,17 @@ Prompt:
 Use LLM (chatgpt) api to classify if the comments are in favour, neutral or against.
 Prompt: 
 ```
-Classify the following comment as 'in favor', 'against', or 'neutral':
+    f"""            
+        Classify the following comment as 'in favor', 'against', or 'neutral' based on the following post:
+        post: {post}
+        comment: {comment}
+        The final output should be in the following JSON format:
+        {{
+            "category": "<category>",
+            "reason": "<reason>"
+        }}
+    """
 
-{comment}
-
-Classification:
 ```
 ---
 ### Web Details

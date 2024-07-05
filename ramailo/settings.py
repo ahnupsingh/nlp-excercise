@@ -90,21 +90,21 @@ DATABASES = {
     }
 }
 
-# Logging
-LOGGING = {
-    'version': 1,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django.template': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        },
-    },
-}
+# # Logging
+# LOGGING = {
+#     'version': 1,
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'django.template': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',
+#         },
+#     },
+# }
 
 
 # Password validation
@@ -155,6 +155,11 @@ config = dotenv_values(".env")
 OPENAI_API_KEY = config.get('OPENAI_API_KEY')
 TWITTER_USERNAME = config.get('TWITTER_USERNAME')
 TWITTER_PASSWORD = config.get('TWITTER_PASSWORD')
+
+# Reddit
+REDDIT_CLIENT_ID = config.get('REDDIT_CLIENT_ID')
+REDDIT_CLIENT_SECRET = config.get('REDDIT_CLIENT_SECRET')
+REDDIT_USER_AGENT = config.get('REDDIT_USER_AGENT')
 
 UNFOLD = {
     "SITE_TITLE": "Ramailo",
@@ -219,7 +224,15 @@ UNFOLD = {
 
 
                     {
-                        "title": _("Groups"),
+                        "title": _("Posts"),
+                        "icon": "group",
+                        "badge": "aquarius.views.group_badge_callback",
+                        "link": reverse_lazy("admin:auth_group_changelist"),
+                    },
+
+
+                    {
+                        "title": _("Reports"),
                         "icon": "group",
                         "badge": "aquarius.views.group_badge_callback",
                         "link": reverse_lazy("admin:auth_group_changelist"),

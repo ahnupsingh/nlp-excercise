@@ -12,4 +12,4 @@ class CityListView(ListAPIView):
 def reddit_summary_view(request, topic):
     service = RedditService()
     result = service.fetch_hot_posts(topic)
-    return render(request, 'summary.html', {**result, 'topic': topic})
+    return render(request, 'summary.html', {**result})

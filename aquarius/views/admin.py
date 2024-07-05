@@ -4,8 +4,7 @@ from aquarius.service import ChartService, RedditService
 
 def dashboard_callback(request, context):
     bar_chart_details = ChartService().bar_chart()
-    topic = "kathmandu"
-    summary_details = RedditService().fetch_hot_posts(topic)
+    summary_details = RedditService().fetch_hot_posts("kathmandu")
     context.update(
         {
             "cards": [
@@ -24,7 +23,6 @@ def dashboard_callback(request, context):
             ],
             **bar_chart_details,
             **summary_details, 
-            'topic': topic
         }
     )
     return context

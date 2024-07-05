@@ -1,3 +1,4 @@
+import json
 from .base import SentimentAnalyzer
 import time
 import openai
@@ -105,30 +106,54 @@ class ChatGPTSentimentAnalyzer(SentimentAnalyzer):
         json_data = batch[['clean_reviews','pred_label']].to_json(orient='records')
         sample_json_data = train_sample[['clean_reviews','label']].to_json(orient='records')
         messages = [{"role": "user", "content": prompt}]
+
+        # TODO : add langchain structured output
+        # output_format: json
+        # mle-core
         response = openai.ChatCompletion.create(model=self.model,messages=messages,temperature=0)
         time.sleep(5)
         return response.choices[0].message["content"]
     
-    def classify_comments(self, comment):
-        prompt = f"Classify the following comment as 'in favor', 'against', or 'neutral':\n\n{comment}\n\nClassification:"
+    def classify_comments(self, post, comment):
+        prompt = f"""
+        Classify the following comment as 'in favor', 'against', or 'neutral' based on the following post:
+        post: {post}
+        comment: {comment}
+        The final output should be in the following JSON format:
+        {{
+            "category": "<category>",
+            "reason": "<reason>"
+        }}
+        """
         response = openai.ChatCompletion.create(
             model=self.model,
             messages=[
                 {"role": "system", "content": "You are a helpful assistant that classifies comments."},
                 {"role": "user", "content": prompt}
-            ]
+            ],
+            structured_output_format="json"
         )
-        classification = response.choices[0].message['content'].strip().lower()
-        return classification
+
+        content = response.choices[0].message['content'].strip()
+        if 'json' in content:
+            content = content.split("json\n")[1].replace('`', '').replace('\n', '')
+
+        try:
+            classification = json.loads(content)
+        except json.JSONDecodeError:
+            raise ValueError("Response format is incorrect or not JSON parsable.")
+        category = classification['category'].strip().lower()
+        reason = classification['reason'].strip().lower()
+        return category, reason
 
 
-    def classify_comments_with_gpt3(self, comments):
+    def classify_comments_with_gpt3(self, post, comments):
         classified_comments = {'in_favor': [], 'against': [], 'neutral': []}
         for comment in comments:
-            classification = self.classify_comments(comment)
-            if classification == 'in favor':
+            category, reason = self.classify_comments(post, comment)
+            if category == 'in favor':
                 classified_comments['in_favor'].append(comment)
-            elif classification == 'against':
+            elif category == 'against':
                 classified_comments['against'].append(comment)
             else:
                 classified_comments['neutral'].append(comment)

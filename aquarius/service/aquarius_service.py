@@ -2,13 +2,15 @@
 import json
 import pandas as pd
 from utils.sentiment_analyzer import ChatGPTSentimentAnalyzer
+from aquarius.models import City
 
 class AquariusService:
     def __init__(self):
         self.analyzer = ChatGPTSentimentAnalyzer()
 
     def get_cities(self):
-        pass
+        cities = City.objects.all()
+        return cities
 
     def get_reviews(self, city):
         data = pd.read_csv('data/amazon_alexa.tsv', sep='\t')
