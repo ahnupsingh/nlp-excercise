@@ -141,8 +141,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
-
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -203,7 +206,7 @@ UNFOLD = {
                 "items": [
                     {
                         "title": _("Dashboard"),
-                        "icon": "dashboard",  # Supported icon set: https://fonts.google.com/icons
+                        "icon": "dashboard",
                         "link": reverse_lazy("admin:index"),
                         "badge": "aquarius.views.report_badge_callback",
                         "permission": lambda request: request.user.is_superuser,
@@ -226,16 +229,31 @@ UNFOLD = {
                     {
                         "title": _("Posts"),
                         "icon": "group",
-                        "badge": "aquarius.views.group_badge_callback",
-                        "link": reverse_lazy("admin:auth_group_changelist"),
+                        "badge": "aquarius.views.post_badge_callback",
+                        "link": reverse_lazy("admin:aquarius_post_changelist"),
+                    },
+
+
+                    {
+                        "title": _("Comments"),
+                        "icon": "group",
+                        "badge": "aquarius.views.comment_badge_callback",
+                        "link": reverse_lazy("admin:aquarius_comment_changelist"),
                     },
 
 
                     {
                         "title": _("Reports"),
                         "icon": "group",
-                        "badge": "aquarius.views.group_badge_callback",
-                        "link": reverse_lazy("admin:auth_group_changelist"),
+                        "badge": "aquarius.views.report_badge_callback",
+                        "link": reverse_lazy("admin:aquarius_report_changelist"),
+                    },
+
+                    {
+                        "title": _("Hot Topics"),
+                        "icon": "group",
+                        "badge": "aquarius.views.report_badge_callback",
+                        "link": reverse_lazy("admin:aquarius_hottopic_changelist"),
                     },
                 ],
             },

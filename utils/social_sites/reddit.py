@@ -8,7 +8,7 @@ class RedditAPI:
             client_secret=settings.REDDIT_CLIENT_SECRET,
             user_agent=settings.REDDIT_USER_AGENT
         )
-        self.mock = True
+        self.mock = False
 
     def fetch_hot_posts(self, city):
         if self.mock:
@@ -19,5 +19,4 @@ class RedditAPI:
             ]
         subreddit = self.reddit.subreddit(city)
         hot_posts = subreddit.hot(limit=10)
-        comments = [comment for post in hot_posts for comment in post.comments.list()]
-        return comments
+        return hot_posts

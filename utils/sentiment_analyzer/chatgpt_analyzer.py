@@ -117,7 +117,7 @@ class ChatGPTSentimentAnalyzer(SentimentAnalyzer):
     def classify_comments(self, post, comment):
         prompt = f"""
         Classify the following comment as 'in favor', 'against', or 'neutral' based on the following post:
-        post: {post}
+        post: {post.topic} - {post.content}
         comment: {comment}
         The final output should be in the following JSON format:
         {{
@@ -131,7 +131,8 @@ class ChatGPTSentimentAnalyzer(SentimentAnalyzer):
                 {"role": "system", "content": "You are a helpful assistant that classifies comments."},
                 {"role": "user", "content": prompt}
             ],
-            structured_output_format="json"
+            temperature=0.3,
+            max_tokens=150
         )
 
         content = response.choices[0].message['content'].strip()
@@ -144,17 +145,67 @@ class ChatGPTSentimentAnalyzer(SentimentAnalyzer):
             raise ValueError("Response format is incorrect or not JSON parsable.")
         category = classification['category'].strip().lower()
         reason = classification['reason'].strip().lower()
+        print(f"Comment: {comment}, Classifiction: {category}, Reason: {reason}")
         return category, reason
+    
 
+    def get_hot_topics(self, city, posts):
+        post_list = '\n'.join([f"- {post.id} -{post.topic}: {post.content}" for post in posts])
+        prompt = f"""
+        Identify the hot topic being discussed in the city: {city} out of following posts:
+        {post_list}
+        Above post is listed in format <post_id> - <post_title>: <post_content>.
+        The final output should be in the following JSON format:
+        {{
+            "<identitfied_hot_topic>": [<post_id>, <post_id>, ...],
+        }}
+        """
+        response = openai.ChatCompletion.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that analyzes popular discussions going around the city."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0,
+            max_tokens=150
+        )
 
-    def classify_comments_with_gpt3(self, post, comments):
-        classified_comments = {'in_favor': [], 'against': [], 'neutral': []}
-        for comment in comments:
-            category, reason = self.classify_comments(post, comment)
-            if category == 'in favor':
-                classified_comments['in_favor'].append(comment)
-            elif category == 'against':
-                classified_comments['against'].append(comment)
-            else:
-                classified_comments['neutral'].append(comment)
-        return classified_comments
+        content = response.choices[0].message['content'].strip()
+        try:
+            content = json.loads(content)
+        except json.JSONDecodeError:
+            raise ValueError("Response format is incorrect or not JSON parsable.")
+        return content
+    
+    def identify_arguments(self, post, comments):
+        comment_list = '\n'.join([f"- {comment.id}-{comment.topic}" for comment in comments])
+        prompt = f"""
+        Following are the list of comments that are in favour of given post::
+        post: {post.topic} - {post.content}
+
+        Comments:
+        {comment_list}
+
+        Above post is listed in format <comment_id> - <post_title>: <post_content>.
+        Identify the argument used by the customer in the comments to support the post and return it in the following JSON format.
+
+        {{
+            "<comment_id>": <argument>
+        }}
+        """
+        response = openai.ChatCompletion.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that analyzes popular discussions going around the city."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0,
+            max_tokens=150
+        )
+
+        content = response.choices[0].message['content'].strip()
+        try:
+            content = json.loads(content)
+        except json.JSONDecodeError:
+            raise ValueError("Response format is incorrect or not JSON parsable.")
+        return content

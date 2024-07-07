@@ -1,10 +1,9 @@
-from aquarius.models import City
+from aquarius.models import City, Post, Comment, Report
 from django.contrib.auth.models import User, Group
 from aquarius.service import ChartService, RedditService
 
 def dashboard_callback(request, context):
     bar_chart_details = ChartService().bar_chart()
-    summary_details = RedditService().fetch_hot_posts("kathmandu")
     context.update(
         {
             "cards": [
@@ -21,8 +20,9 @@ def dashboard_callback(request, context):
                     "metric": "100"
                 },
             ],
+            "cities": City.objects.all(),
+            "scripts": ["/static/admin_dashboard.js"],
             **bar_chart_details,
-            **summary_details, 
         }
     )
     return context
@@ -38,3 +38,12 @@ def group_badge_callback(request):
 
 def report_badge_callback(request):
     return 0
+
+def post_badge_callback(request):
+    return Post.objects.count()
+
+def comment_badge_callback(request):
+    return Comment.objects.count()
+
+def report_badge_callback(request):
+    return Report.objects.count()
